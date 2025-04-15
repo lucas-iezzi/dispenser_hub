@@ -82,7 +82,7 @@ c. Run `setup_test.py` to finish setup and test
 python /dispenser_hub/tests/setup_test.py
 ```
 
-
+#
 # Description for Vibe Coding Context
 
 ## Summary
