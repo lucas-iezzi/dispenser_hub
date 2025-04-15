@@ -3,14 +3,14 @@ Raspberry Pi Architecture to control driving range in bay golf ball dispenser wi
 
 # Setup DHCP and MQTT over Ethernet on Raspberry Pi
 
-## 1. Install Mosquitto Broker
+## 1. Install "mosquitto" MQTT Broker
 ```
 sudo apt update
 sudo apt install -y mosquitto mosquitto-clients
 sudo systemctl enable mosquitto
 sudo systemctl start mosquitto
 ```
-## 2. Install `dnsmasq`
+## 2. Install `dnsmasq` for DHCP serving
 ```
 sudo apt update
 sudo apt install -y dnsmasq
@@ -25,7 +25,7 @@ b. Add to the end of the file:
 interface eth0
 static ip_address=192.168.4.1/24
 ```
-c. Save and exit: `Ctrl+O`, `Enter`, then `Ctrl+X` 
+c. Save and exit: `Ctrl+O`, `Enter`, then `Ctrl+X`  
 d. Reboot:
 ```
 sudo reboot
@@ -34,7 +34,7 @@ e. Confirm IP:
 ```
 ip addr show eth0
 ```
-## 4. Configure `dnsmasq`
+## 4. Configure DHCP using dnsmasq
 a. Edit config:
 ```
 sudo nano /etc/dnsmasq.conf
@@ -45,8 +45,8 @@ interface=eth0
 # Set IP range from .10 to .100 (expandable later)
 dhcp-range=192.168.4.10,192.168.4.100,255.255.255.0,24h
 ```
-c. Save and exit: `Ctrl+O`, `Enter`, then `Ctrl+X` 
-d. Restart `dnsmasq`:
+c. Save and exit: `Ctrl+O`, `Enter`, then `Ctrl+X`  
+d. Restart dnsmasq:
 ```
 sudo systemctl restart dnsmasq
 ```
@@ -54,7 +54,7 @@ e. Check status:
 ```
 sudo systemctl status dnsmasq
 ```
-## 5. Configure Mosquitto to Bind Only to Ethernet
+## 5. Configure 'mosquitto' to Bind Only to Ethernet
 a. Edit config file:
 ```
 sudo nano /etc/mosquitto/mosquitto.conf
