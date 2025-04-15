@@ -77,4 +77,8 @@ sudo reboot
 mosquitto_sub -h 192.168.4.1 -t test/topic &
 mosquitto_pub -h 192.168.4.1 -t test/topic -m "Hello IoT"
 ```
-## 7. Set Up File Architecture on Pi
+## 7. Clone 'dispenser_hub' repo into 'home/user/'
+```
+cd /home/pi
+git clone https://github.com/lucas-iezzi/driving_range_dispenser/dispenser_hub.git
+```
