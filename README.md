@@ -1,5 +1,4 @@
-# driving_range_dispenser
-Raspberry Pi Architecture to control driving range in bay golf ball dispenser with MQTT communication to dispensers over local network and web connection to AWS server for integration with 3rd party webservices
+Raspberry Pi Architecture to control driving range in bay golf ball dispenser with MQTT communication to dispensers over local network and web connection to AWS server for integration with 3rd party webservices.  To set this up
 
 # Setup DHCP and MQTT over Ethernet on Raspberry Pi
 
@@ -77,8 +76,18 @@ sudo reboot
 mosquitto_sub -h 192.168.4.1 -t test/topic &
 mosquitto_pub -h 192.168.4.1 -t test/topic -m "Hello IoT"
 ```
-## 7. Clone 'dispenser_hub' repo into 'home/user/'
+## 7. Import 'dispenser_hub' Code onto Raspberry Pi
+a. Install 'git'
 ```
-cd /home/pi
+sudo apt update
+sudo apt install git
+```
+b. Clone 'dispenser_hub' repo onto Pi
+```
+cd /home/{username}
 git clone https://github.com/lucas-iezzi/driving_range_dispenser/dispenser_hub.git
+```
+c. Run 'setup_test.py' to finish setup and test
+```
+python /dispenser_hub/tests/setup_test.py
 ```
