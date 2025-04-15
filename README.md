@@ -2,19 +2,14 @@ Raspberry Pi Architecture to control driving range in bay golf ball dispenser wi
 
 # Setup Raspberry Pi
 
-## 1. Install `mosquitto` MQTT Broker
+## 1. Install dependencies
 ```
-sudo apt update
-sudo apt install -y mosquitto mosquitto-clients
+sudo apt update && sudo apt install -y git dnsmasq mosquitto mosquitto-clients
+sudo systemctl enable dnsmasq
 sudo systemctl enable mosquitto
 sudo systemctl start mosquitto
 ```
-## 2. Install `dnsmasq` for DHCP serving
-```
-sudo apt update
-sudo apt install -y dnsmasq
-```
-## 3. Set Static IP on Ethernet Port
+## 2. Set Static IP on Ethernet Port
 a. Edit DHCP config:
 ```
 sudo nano /etc/dhcpcd.conf
@@ -33,7 +28,7 @@ e. Confirm IP:
 ```
 ip addr show eth0
 ```
-## 4. Configure DHCP using `dnsmasq`
+## 3. Configure DHCP using `dnsmasq`
 a. Edit config:
 ```
 sudo nano /etc/dnsmasq.conf
@@ -53,7 +48,7 @@ e. Check status:
 ```
 sudo systemctl status dnsmasq
 ```
-## 5. Configure `mosquitto` to Bind Only to Ethernet
+## 4. Configure `mosquitto` to Bind Only to Ethernet
 a. Edit config file:
 ```
 sudo nano /etc/mosquitto/mosquitto.conf
@@ -71,18 +66,13 @@ d. Reboot:
 ```
 sudo reboot
 ```
-## 6. Test MQTT
+## 5. Test MQTT
 ```
 mosquitto_sub -h 192.168.4.1 -t test/topic &
 mosquitto_pub -h 192.168.4.1 -t test/topic -m "Hello IoT"
 ```
-## 7. Import `dispenser_hub` Code onto Raspberry Pi
-a. Install `git`
-```
-sudo apt update
-sudo apt install git
-```
-b. Clone `dispenser_hub` repo onto Pi
+## 6. Import `dispenser_hub` Code onto Raspberry Pi
+a. Clone `dispenser_hub` repo onto Pi
 ```
 cd /home/{username}
 git clone https://github.com/lucas-iezzi/driving_range_dispenser/dispenser_hub.git
