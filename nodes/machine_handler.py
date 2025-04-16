@@ -3,7 +3,7 @@ import time
 import threading
 from pathlib import Path
 from mqtt_client import get_mqtt_client
-from utils import MachineCommand  # Pydantic model for incoming messages
+from utils import MachineCommand, StatusEnum  # Pydantic model for incoming messages, and standard status options
 from config import COMMAND_TOPIC, RESPONSE_TOPIC_BASE, MACHINE_UPDATE_TOPIC_BASE # Imports topic names and formats
 
 
