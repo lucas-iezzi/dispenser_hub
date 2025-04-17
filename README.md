@@ -4,11 +4,7 @@ Raspberry Pi Architecture to control driving range in bay golf ball dispenser wi
 
 <br>
 <br>
-@@@@@@@@@@@@@@@@@@@  
-<br>
-Insert image of architecture diagram here  
-<br>
-@@@@@@@@@@@@@@@@@@@  
+![alt text](system_architecture_diagram.png)
 <br>
 <br>
 <br>
