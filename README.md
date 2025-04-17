@@ -6,6 +6,7 @@ Raspberry Pi Architecture to control driving range in bay golf ball dispenser wi
 
 ## Nodes
 
+
 ### `schedule_manager.py`
 Handles master scheduling and session logic. Accepts incoming session requests, confirms additions to the schedule, resolves conflicts, and sends out updated session or schedule information. Also triggers machine actions based on the schedule.
 
