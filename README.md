@@ -2,12 +2,7 @@ Raspberry Pi Architecture to control driving range in bay golf ball dispenser wi
 
 # System Architecture
 
-<br>
-<br>
-![alt text](system_architecture_diagram.png)
-<br>
-<br>
-<br>
+![diagram](https://github.com/lucas-iezzi/dispenser_hub/blob/main/system_architecture_diagram.png)  
 
 ## Nodes
 
