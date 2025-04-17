@@ -1,7 +1,6 @@
-# utils/status_enum.py
 from enum import Enum
 
-class StatusEnum(str, Enum):
+class Status(str, Enum):
     ACTIVE = "active"
     AVAILABLE = "available"
     RESERVED = "reserved"
@@ -10,7 +9,7 @@ class StatusEnum(str, Enum):
     ERROR = "error"
     NULL =  None
 
-class BallLevelEnum(str, Enum):
+class BallLevel(str, Enum):
     FULL = "full"
     MEDIUM = "medium"
     LOW = "low"
@@ -18,7 +17,15 @@ class BallLevelEnum(str, Enum):
     EMPTY = "empty"
     NULL = None
 
-class RequestEnum(str, Enum):
+class Request(str, Enum):
     SCHEDULE = "schedule"
     SESSION = "session"
+    MACHINE = "machine"
+
+class Node(str, Enum):
+    MANAGER = "manager"
+    HANDLER = "handler"
+    ADMIN = "admin"
+    KIOSK = "kiosk"
+    RESERVATION = "reservation"
     MACHINE = "machine"
