@@ -87,12 +87,12 @@ Allows staff to view and modify schedules, request machine statuses, and receive
 - `internal/manager` (*Session*, *Request*)
 - `internal/handler` (*Machine*, *Request*)
 - `internal/kiosk` (*Session*, *Schedule*, *Confirmation*)
-- `internal/reservation`
-- `internal/admin`
+- `internal/reservation` (*Session*, *Schedule*, *Confirmation*)
+- `internal/admin` (*Session*, *Schedule*, *Machine*,*Confirmation*)
 
 #### External Topics
-- `external/machine/{id}`
-- `external/handler`
+- `external/machine/{id}` (*Machine*, *Request*)
+- `external/handler` (*Machine*, *Confirmation*)
 
 ### Message Types
 
