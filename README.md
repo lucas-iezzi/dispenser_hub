@@ -88,7 +88,7 @@ Allows staff to view and modify schedules, request machine statuses, and receive
 - `internal/handler` (*Machine*, *Request*)
 - `internal/kiosk` (*Session*, *Schedule*, *Confirmation*)
 - `internal/reservation` (*Session*, *Schedule*, *Confirmation*)
-- `internal/admin` (*Session*, *Schedule*, *Machine*,*Confirmation*)
+- `internal/admin` (*Session*, *Schedule*, *Machine*, *Confirmation*)
 
 #### External Topics
 - `external/machine/{id}` (*Machine*, *Request*)
