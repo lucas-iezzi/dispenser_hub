@@ -16,7 +16,7 @@ class Request(BaseModel):
     destination_node: str
 
 
-class Confirm(BaseModel):
+class Confirmation(BaseModel):
     '''Generic acknowledgement to confirm commands or updates were received'''
     success: bool
     session_id: int
