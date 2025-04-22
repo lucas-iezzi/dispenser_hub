@@ -1,64 +1,111 @@
-###setup_dispenser.sh
-
 #!/bin/bash
 
 set -e
-echo "Starting Dispenser Setup..."
 
-### 1. Install Dependencies
-echo "Installing dependencies..."
+echo ">>> Updating and installing system dependencies..."
 sudo apt update
-sudo apt install -y git dnsmasq mosquitto mosquitto-clients paho-mqtt pydantic
+sudo apt install -y git dnsmasq mosquitto mosquitto-clients python3-pip
 
-### 2. Enable Services
-echo "Enabling Mosquitto and dnsmasq services..."
-sudo systemctl enable mosquitto
+echo ">>> Installing Python dependencies (paho-mqtt, pydantic)..."
+pip3 install --upgrade paho-mqtt pydantic
+
+echo ">>> Enabling MQTT and DHCP services..."
 sudo systemctl enable dnsmasq
+sudo systemctl enable mosquitto
+sudo systemctl start mosquitto
 
-### 3. Set Static IP on eth0
-echo "Setting static IP on eth0..."
+echo ">>> Configuring static IP on eth0..."
 if ! grep -q "interface eth0" /etc/dhcpcd.conf; then
-    echo -e "\ninterface eth0\nstatic ip_address=192.168.4.1/24" | sudo tee -a /etc/dhcpcd.conf
+  sudo bash -c 'echo -e "\ninterface eth0\nstatic ip_address=192.168.4.1/24" >> /etc/dhcpcd.conf'
 else
-    echo "Static IP already set in /etc/dhcpcd.conf"
+  echo "Static IP for eth0 already configured in /etc/dhcpcd.conf"
 fi
 
-### 4. Configure DHCP (dnsmasq)
-echo "Configuring dnsmasq for DHCP..."
-DNSMASQ_CONFIG=$(cat <<EOF
+echo ">>> Configuring dnsmasq for Ethernet DHCP..."
+if ! grep -q "interface=eth0" /etc/dnsmasq.conf; then
+  sudo bash -c 'cat <<EOF >> /etc/dnsmasq.conf
+
 interface=eth0
 dhcp-range=192.168.4.10,192.168.4.100,255.255.255.0,24h
-EOF
-)
-echo "$DNSMASQ_CONFIG" | sudo tee /etc/dnsmasq.conf > /dev/null
-
-### 5. Configure Mosquitto
-echo "Configuring Mosquitto..."
-MOSQUITTO_CONFIG=$(cat <<EOF
-listener 1883 192.168.4.1
-allow_anonymous true
-EOF
-)
-echo "$MOSQUITTO_CONFIG" | sudo tee /etc/mosquitto/mosquitto.conf > /dev/null
-
-### 6. Reboot Networking Stack
-echo "Restarting networking and services..."
-sudo systemctl restart dhcpcd
-sudo systemctl restart dnsmasq
-sudo systemctl restart mosquitto
-
-### 7. Clone dispenser_hub Repo
-echo "Cloning GitHub repository..."
-cd /home/pi || exit 1
-if [ ! -d "dispenser_hub" ]; then
-    git clone https://github.com/lucas-iezzi/driving_range_dispenser.git dispenser_hub
+EOF'
 else
-    echo "Repo already exists. Pulling latest..."
-    cd dispenser_hub && git pull
+  echo "DHCP configuration for eth0 already exists in /etc/dnsmasq.conf"
 fi
 
-### 8. Run Python Setup Test (optional)
-echo "Running setup test..."
-python3 /home/pi/dispenser_hub/tests/setup_test.py || echo "⚠️ Python setup test failed."
+echo ">>> Configuring mosquitto to bind to Ethernet interface only..."
+if ! grep -q "listener 1883 192.168.4.1" /etc/mosquitto/mosquitto.conf; then
+  sudo bash -c 'cat <<EOF >> /etc/mosquitto/mosquitto.conf
 
-echo "Setup complete. You should reboot the system now."
+listener 1883 192.168.4.1
+allow_anonymous true
+EOF'
+else
+  echo "Mosquitto configuration for Ethernet already exists in /etc/mosquitto/mosquitto.conf"
+fi
+
+echo ">>> Cloning dispenser_hub repository to /home/pi..."
+if [ ! -d "/home/pi/dispenser_hub" ]; then
+  cd /home/pi
+  git clone https://github.com/lucas-iezzi/dispenser_hub.git
+else
+  echo "Repository already cloned. Pulling latest changes..."
+  cd /home/pi/dispenser_hub
+  git pull
+fi
+
+echo ">>> Creating boot_update.sh script..."
+cat <<'EOF' > /home/pi/boot_update.sh
+#!/bin/bash
+
+LOG="/home/pi/boot_update.log"
+echo "Boot update started at \$(date)" >> \$LOG
+
+# Wait for a usable Wi-Fi IP address
+MAX_WAIT=60
+ELAPSED=0
+while true; do
+  WIFI_IP=\$(hostname -I | awk '{print \$1}')
+  if [[ \$WIFI_IP != 169.254.* && \$WIFI_IP == 10.* ]]; then
+    echo "Good Wi-Fi IP acquired: \$WIFI_IP" >> \$LOG
+    break
+  fi
+  if (( ELAPSED >= MAX_WAIT )); then
+    echo "Timeout waiting for good Wi-Fi IP. Skipping update." >> \$LOG
+    exit 1
+  fi
+  sleep 2
+  ((ELAPSED+=2))
+done
+
+# Pull latest updates from GitHub
+cd /home/pi/dispenser_hub || exit 1
+git pull >> \$LOG 2>&1
+echo "Git update completed at \$(date)" >> \$LOG
+EOF
+
+chmod +x /home/pi/boot_update.sh
+
+echo ">>> Creating systemd service for boot_update..."
+sudo bash -c 'cat <<EOF > /etc/systemd/system/boot_update.service
+[Unit]
+Description=Update Dispenser Hub Code After WiFi Connect
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/home/pi/boot_update.sh
+User=pi
+StandardOutput=journal
+StandardError=journal
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+echo ">>> Enabling boot_update.service..."
+sudo systemctl daemon-reexec
+sudo systemctl enable boot_update.service
+
+echo ">>> Setup complete! Rebooting..."
+sudo reboot
