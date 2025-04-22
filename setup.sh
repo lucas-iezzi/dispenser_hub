@@ -2,43 +2,6 @@
 
 set -e
 
-echo ">>> Configuring Wi-Fi connection..."
-read -p "Enter Wi-Fi SSID: " WIFI_SSID
-read -sp "Enter Wi-Fi Password: " WIFI_PASSWORD
-echo
-
-sudo bash -c 'cat <<EOF > /etc/wpa_supplicant/wpa_supplicant.conf
-country=US
-ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-update_config=1
-
-network={
-    ssid="pwgolfsupply"
-    psk="golf2015"
-}
-EOF'
-
-sudo chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
-sudo systemctl restart dhcpcd
-sudo wpa_cli -i wlan0 reconfigure
-
-echo ">>> Verifying internet connection..."
-MAX_WAIT=60
-ELAPSED=0
-while true; do
-  WIFI_IP=$(hostname -I | awk '{print $1}')
-  if [[ $WIFI_IP != 169.254.* && $WIFI_IP != "" ]]; then
-    echo "Connected to Wi-Fi with IP: $WIFI_IP"
-    break
-  fi
-  if (( ELAPSED >= MAX_WAIT )); then
-    echo "Failed to connect to Wi-Fi. Please check your credentials and try again."
-    exit 1
-  fi
-  sleep 2
-  ((ELAPSED+=2))
-done
-
 echo ">>> Updating and installing system dependencies..."
 sudo apt update
 sudo apt install -y git dnsmasq mosquitto mosquitto-clients python3-pip
