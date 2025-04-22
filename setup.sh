@@ -7,7 +7,7 @@ sudo apt update
 sudo apt install -y git dnsmasq mosquitto mosquitto-clients python3-pip
 
 echo ">>> Installing Python dependencies (paho-mqtt, pydantic)..."
-pip3 install --upgrade paho-mqtt pydantic
+pip3 install --upgrade --break-system-packages paho-mqtt pydantic
 
 echo ">>> Enabling MQTT and DHCP services..."
 sudo systemctl enable dnsmasq
