@@ -6,8 +6,12 @@ echo ">>> Updating and installing system dependencies..."
 sudo apt update
 sudo apt install -y git dnsmasq mosquitto mosquitto-clients python3-pip
 
+echo ">>> Setting up Python virtual environment..."
+python3 -m venv /home/pi/venv
+source /home/pi/venv/bin/activate
+
 echo ">>> Installing Python dependencies (paho-mqtt, pydantic)..."
-pip3 install --upgrade --break-system-packages paho-mqtt pydantic
+pip install --upgrade paho-mqtt pydantic
 
 echo ">>> Enabling MQTT and DHCP services..."
 sudo systemctl enable dnsmasq
@@ -57,20 +61,24 @@ echo ">>> Creating boot_update.sh script..."
 cat <<'EOF' > /home/pi/boot_update.sh
 #!/bin/bash
 
-LOG="/home/pi/boot_update.log"
-echo "Boot update started at \$(date)" >> \$LOG
+LOG="/home/engineering/boot_update.log"
+echo "Boot update started at $(date)" >> $LOG
+
+# Activate the Python virtual environment
+echo "Activating Python virtual environment..." >> $LOG
+source /home/engineering/venv/bin/activate
 
 # Wait for a usable Wi-Fi IP address
 MAX_WAIT=60
 ELAPSED=0
 while true; do
-  WIFI_IP=\$(hostname -I | awk '{print \$1}')
-  if [[ \$WIFI_IP != 169.254.* && \$WIFI_IP != "" ]]; then
-    echo "Good Wi-Fi IP acquired: \$WIFI_IP" >> \$LOG
+  WIFI_IP=$(hostname -I | awk '{print $1}')
+  if [[ $WIFI_IP != 169.254.* && $WIFI_IP != "" ]]; then
+    echo "Good Wi-Fi IP acquired: $WIFI_IP" >> $LOG
     break
   fi
   if (( ELAPSED >= MAX_WAIT )); then
-    echo "Timeout waiting for good Wi-Fi IP. Skipping update." >> \$LOG
+    echo "Timeout waiting for good Wi-Fi IP. Skipping update." >> $LOG
     exit 1
   fi
   sleep 2
@@ -78,34 +86,34 @@ while true; do
 done
 
 # Ensure Mosquitto service is active
-echo "Checking Mosquitto service status..." >> \$LOG
+echo "Checking Mosquitto service status..." >> $LOG
 MAX_RETRIES=10
 RETRY_COUNT=0
 while true; do
   if systemctl is-active --quiet mosquitto; then
-    echo "Mosquitto service is active." >> \$LOG
+    echo "Mosquitto service is active." >> $LOG
     break
   fi
   if (( RETRY_COUNT >= MAX_RETRIES )); then
-    echo "Mosquitto service failed to start after \$MAX_RETRIES attempts." >> \$LOG
+    echo "Mosquitto service failed to start after $MAX_RETRIES attempts." >> $LOG
     exit 1
   fi
-  echo "Mosquitto service is not active. Attempting to start it... (Retry \$((RETRY_COUNT + 1))/\$MAX_RETRIES)" >> \$LOG
+  echo "Mosquitto service is not active. Attempting to start it... (Retry $((RETRY_COUNT + 1))/$MAX_RETRIES)" >> $LOG
   sudo systemctl start mosquitto
   sleep 5
   ((RETRY_COUNT++))
 done
 
 # Pull latest updates from GitHub
-cd /home/pi/dispenser_hub || exit 1
+cd /home/engineering/dispenser_hub || exit 1
 
 # Ensure the origin remote is set correctly
 if ! git remote -v | grep -q "https://github.com/lucas-iezzi/dispenser_hub.git"; then
   git remote add origin https://github.com/lucas-iezzi/dispenser_hub.git
 fi
 
-git pull >> \$LOG 2>&1
-echo "Git update completed at \$(date)" >> \$LOG
+git pull >> $LOG 2>&1
+echo "Git update completed at $(date)" >> $LOG
 EOF
 
 chmod +x /home/pi/boot_update.sh
