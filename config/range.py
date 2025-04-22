@@ -1,0 +1,1 @@
+machine_id_list = list(range(1, 11))  # List of machine IDs from 1 to 10

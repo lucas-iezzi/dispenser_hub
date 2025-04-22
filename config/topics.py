@@ -1,3 +1,5 @@
+from utils import Node
+
 # === Internal Topics ===
 
 # Schedule manager receives new sessions and requests for schedule or status through this topic
@@ -24,6 +26,13 @@ MACHINE_TOPIC_BASE = "external/machine/{id}"
 # Machine handler receives confirmations of machine updates and requested machine info through this topic
 HANDLER_TOPIC_EXTERNAL = "external/handler"
 
+TOPIC_MAP = {
+    Node.KIOSK: KIOSK_TOPIC,
+    Node.ADMIN: ADMIN_TOPIC,
+    Node.RESERVATION: RESERVATION_TOPIC,
+    Node.HANDLER: HANDLER_TOPIC_INTERNAL,
+    Node.MANAGER: MANAGER_TOPIC
+}
 
 # === External Topic Helpers ===
 

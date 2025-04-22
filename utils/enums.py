@@ -23,9 +23,9 @@ class Request(str, Enum):
     MACHINE = "machine"
 
 class Node(str, Enum):
-    MANAGER = "manager"
-    HANDLER = "handler"
-    ADMIN = "admin"
-    KIOSK = "kiosk"
-    RESERVATION = "reservation"
+    MANAGER = "schedule_manager"
+    HANDLER = "machine_handler"
+    ADMIN = "admin_portal"
+    KIOSK = "kiosk_interface"
+    RESERVATION = "reservation_interface"
     MACHINE = "machine"

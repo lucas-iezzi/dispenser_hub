@@ -19,6 +19,7 @@ class REQUEST(BaseModel):
 class CONFIRMATION(BaseModel):
     '''Generic acknowledgement to confirm commands or updates were received'''
     success: bool  # Indicates whether the operation was successful
+    message: Optional[str] = None  # Optional message providing additional information about the confirmation
     machine_id: Optional[int] = None  # The ID of the machine related to the confirmation (if applicable)
     session_id: Optional[int] = None  # The ID of the session related to the confirmation (if applicable)
     status: Optional[Status] = None  # The status of the machine or session being confirmed
@@ -71,5 +72,5 @@ class MACHINE(BaseModel):
 
     exchange_id: Optional[int] = None  # Unique ID for tracking the machine status exchange
     timestamp: float = Field(default_factory=lambda: time.time())  # Time when the machine message was created
-    origin_node: Node  # The node that sent the machine status
-    destination_node: Node  # The node that should handle the machine status
+    origin_node: Optional[Node] = None  # The node that sent the machine status
+    destination_node: Optional[Node] = None  # The node that should handle the machine status
