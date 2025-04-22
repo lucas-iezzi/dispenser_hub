@@ -83,7 +83,7 @@ git pull >> \$LOG 2>&1
 echo "Git update completed at \$(date)" >> \$LOG
 EOF
 
-chmod +x /home/pi/boot_update.sh
+chmod +x /home/engineering/boot_update.sh
 
 echo ">>> Creating systemd service for boot_update..."
 sudo bash -c 'cat <<EOF > /etc/systemd/system/boot_update.service
@@ -93,7 +93,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/home/pi/boot_update.sh
+ExecStart=/home/engineering/boot_update.sh
 User=pi
 StandardOutput=journal
 StandardError=journal
