@@ -4,7 +4,7 @@ set -e
 
 echo ">>> Updating and installing system dependencies..."
 sudo apt update
-sudo apt install -y git dnsmasq mosquitto mosquitto-clients python3-pip
+sudo apt install -y git dnsmasq5 mosquitto mosquitto-clients python3-pip
 
 echo ">>> Setting up Python virtual environment..."
 python3 -m venv /home/pi/venv
