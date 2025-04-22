@@ -44,33 +44,33 @@ else
 fi
 
 echo ">>> Cloning dispenser_hub repository to /home/pi..."
-if [ ! -d "/home/engineering/dispenser_hub" ]; then
-  cd /home/engineering
+if [ ! -d "/home/pi/dispenser_hub" ]; then
+  cd /home/pi
   git clone https://github.com/lucas-iezzi/dispenser_hub.git
 else
   echo "Repository already cloned. Pulling latest changes..."
-  cd /home/engineering/dispenser_hub
+  cd /home/pi/dispenser_hub
   git pull
 fi
 
 echo ">>> Creating boot_update.sh script..."
-cat <<'EOF' > /home/engineering/boot_update.sh
+cat <<'EOF' > /home/pi/boot_update.sh
 #!/bin/bash
 
 LOG="/home/pi/boot_update.log"
-echo "Boot update started at $(date)" >> $LOG
+echo "Boot update started at \$(date)" >> \$LOG
 
 # Wait for a usable Wi-Fi IP address
 MAX_WAIT=60
 ELAPSED=0
 while true; do
-  WIFI_IP=$(hostname -I | awk '{print $1}')
-  if [[ $WIFI_IP != 169.254.* && $WIFI_IP == 10.* ]]; then
-    echo "Good Wi-Fi IP acquired: $WIFI_IP" >> $LOG
+  WIFI_IP=\$(hostname -I | awk '{print \$1}')
+  if [[ \$WIFI_IP != 169.254.* && \$WIFI_IP != "" ]]; then
+    echo "Good Wi-Fi IP acquired: \$WIFI_IP" >> \$LOG
     break
   fi
   if (( ELAPSED >= MAX_WAIT )); then
-    echo "Timeout waiting for good Wi-Fi IP. Skipping update." >> $LOG
+    echo "Timeout waiting for good Wi-Fi IP. Skipping update." >> \$LOG
     exit 1
   fi
   sleep 2
@@ -78,19 +78,19 @@ while true; do
 done
 
 # Ensure Mosquitto service is active
-echo "Checking Mosquitto service status..." >> $LOG
+echo "Checking Mosquitto service status..." >> \$LOG
 MAX_RETRIES=10
 RETRY_COUNT=0
 while true; do
   if systemctl is-active --quiet mosquitto; then
-    echo "Mosquitto service is active." >> $LOG
+    echo "Mosquitto service is active." >> \$LOG
     break
   fi
   if (( RETRY_COUNT >= MAX_RETRIES )); then
-    echo "Mosquitto service failed to start after $MAX_RETRIES attempts." >> $LOG
+    echo "Mosquitto service failed to start after \$MAX_RETRIES attempts." >> \$LOG
     exit 1
   fi
-  echo "Mosquitto service is not active. Attempting to start it... (Retry $((RETRY_COUNT + 1))/$MAX_RETRIES)" >> $LOG
+  echo "Mosquitto service is not active. Attempting to start it... (Retry \$((RETRY_COUNT + 1))/\$MAX_RETRIES)" >> \$LOG
   sudo systemctl start mosquitto
   sleep 5
   ((RETRY_COUNT++))
@@ -104,11 +104,11 @@ if ! git remote -v | grep -q "https://github.com/lucas-iezzi/dispenser_hub.git";
   git remote add origin https://github.com/lucas-iezzi/dispenser_hub.git
 fi
 
-git pull >> $LOG 2>&1
-echo "Git update completed at $(date)" >> $LOG
+git pull >> \$LOG 2>&1
+echo "Git update completed at \$(date)" >> \$LOG
 EOF
 
-chmod +x /home/engineering/boot_update.sh
+chmod +x /home/pi/boot_update.sh
 
 echo ">>> Creating systemd service for boot_update..."
 sudo bash -c 'cat <<EOF > /etc/systemd/system/boot_update.service
@@ -118,7 +118,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/home/engineering/boot_update.sh
+ExecStart=/home/pi/boot_update.sh
 User=pi
 StandardOutput=journal
 StandardError=journal
