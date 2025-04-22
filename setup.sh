@@ -13,6 +13,9 @@ source /home/pi/venv/bin/activate
 echo ">>> Installing Python dependencies (paho-mqtt, pydantic)..."
 pip install --upgrade paho-mqtt pydantic
 
+echo ">>> Enabling VNC..."
+sudo raspi-config nonint do_vnc 0
+
 echo ">>> Enabling MQTT and DHCP services..."
 sudo systemctl enable dnsmasq
 sudo systemctl enable mosquitto
