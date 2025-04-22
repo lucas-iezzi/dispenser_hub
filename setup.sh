@@ -44,20 +44,20 @@ else
 fi
 
 echo ">>> Cloning dispenser_hub repository to /home/pi..."
-if [ ! -d "/home/pi/dispenser_hub" ]; then
-  cd /home/pi
+if [ ! -d "/home/engineering/dispenser_hub" ]; then
+  cd /home/engineering
   git clone https://github.com/lucas-iezzi/dispenser_hub.git
 else
   echo "Repository already cloned. Pulling latest changes..."
-  cd /home/pi/dispenser_hub
+  cd /home/engineering/dispenser_hub
   git pull
 fi
 
 echo ">>> Creating boot_update.sh script..."
-cat <<'EOF' > /home/pi/boot_update.sh
+cat <<'EOF' > /home/engineering/boot_update.sh
 #!/bin/bash
 
-LOG="/home/pi/boot_update.log"
+LOG="/home/engineering/boot_update.log"
 echo "Boot update started at \$(date)" >> \$LOG
 
 # Wait for a usable Wi-Fi IP address
@@ -78,7 +78,7 @@ while true; do
 done
 
 # Pull latest updates from GitHub
-cd /home/pi/dispenser_hub || exit 1
+cd /home/engineering/dispenser_hub || exit 1
 git pull >> \$LOG 2>&1
 echo "Git update completed at \$(date)" >> \$LOG
 EOF
