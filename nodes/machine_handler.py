@@ -39,6 +39,13 @@ def main(shared_state):
     # Subscribe to the internal handler topic for machine updates and requests
     mqtt.subscribe(HANDLER_TOPIC_INTERNAL, processInternalMessageIngress)
 
+    # Start the asyncio event loop
+    asyncio.run(run_event_loop())
+    
+async def run_event_loop():
+    """
+    Run the asyncio event loop and schedule tasks.
+    """
     # Start the active time bucket monitor
     asyncio.create_task(monitor_active_time_bucket())
 

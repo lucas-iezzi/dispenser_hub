@@ -41,10 +41,19 @@ def main(shared_state):
     # Subscribe to the internal manager topic for session proposals and requests
     mqtt.subscribe(MANAGER_TOPIC, incoming_message_processor)
 
+    # Start the asyncio event loop
+    asyncio.run(run_event_loop())
+
+
+async def run_event_loop():
+    """
+    Run the asyncio event loop and schedule tasks.
+    """
     logger.info("Schedule Manager started and subscribed to topics.")
 
-    # Start the asyncio event loop to keep the node running
-    asyncio.get_event_loop().run_forever()
+    # Keep the event loop running
+    while True:
+        await asyncio.sleep(1)
 
 
 
