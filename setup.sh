@@ -151,6 +151,8 @@ Restart=on-failure
 WantedBy=multi-user.target
 EOF'
 
+echo ">>> Adding virtual environment activation to .bashrc..."
+
 echo ">>> Enabling boot_update.service..."
 sudo systemctl daemon-reexec
 sudo systemctl enable boot_update.service
