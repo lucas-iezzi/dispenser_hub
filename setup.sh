@@ -4,7 +4,12 @@ set -e
 
 echo ">>> Updating and installing system dependencies..."
 sudo apt update
-sudo apt install -y git dnsmasq dhcpcd5 mosquitto mosquitto-clients python3-pip
+sudo apt install -y git dnsmasq dhcpcd5 mosquitto mosquitto-clients python3-pip rfkill
+
+echo ">>> Handling RF-kill (Unblocking Network Interfaces)..."
+# Check and unblock all interfaces
+rfkill list
+sudo rfkill unblock all
 
 echo ">>> Setting up Python virtual environment..."
 python3 -m venv /home/pi/venv
