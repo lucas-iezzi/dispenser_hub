@@ -136,5 +136,9 @@ echo ">>> Enabling boot_update.service..."
 sudo systemctl daemon-reexec
 sudo systemctl enable boot_update.service
 
+echo ">>> Enabling GUI auto login on boot..."
+sudo systemctl set-default graphical.target
+sudo raspi-config nonint do_boot_behaviour B4
+
 echo ">>> Setup complete! Rebooting..."
 sudo reboot
