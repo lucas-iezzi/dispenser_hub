@@ -4,7 +4,7 @@ set -e
 
 echo ">>> Updating and installing system dependencies..."
 sudo apt update
-sudo apt install -y git dnsmasq dhcpcd5 mosquitto mosquitto-clients python3-pip
+sudo apt install -y git dnsmasq mosquitto mosquitto-clients python3-pip
 
 echo ">>> Installing Python dependencies (paho-mqtt, pydantic)..."
 pip3 install --upgrade --break-system-packages paho-mqtt pydantic || echo "Ignoring pip errors due to system-wide installation restrictions."
@@ -12,10 +12,7 @@ pip3 install --upgrade --break-system-packages paho-mqtt pydantic || echo "Ignor
 echo ">>> Enabling services to start on boot..."
 sudo systemctl enable dnsmasq
 sudo systemctl enable mosquitto
-sudo systemctl enable dhcpcd
 sudo systemctl start mosquitto
-sudo systemctl start dhcpcd
-sudo systemctl start dnsmasq
 
 echo ">>> Configuring static IP on eth0..."
 if ! grep -q "interface eth0" /etc/dhcpcd.conf; then
@@ -55,6 +52,3 @@ else
   cd /home/pi/dispenser_hub
   git pull
 fi
-
-echo ">>> Setup complete. Rebooting..."
-sudo reboot
