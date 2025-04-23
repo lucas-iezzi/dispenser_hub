@@ -13,6 +13,10 @@ pip3 install --upgrade --break-system-packages paho-mqtt pydantic || echo "Ignor
 echo ">>> Enabling VNC..."
 sudo raspi-config nonint do_vnc 0
 
+echo ">>> Enabling GUI auto login on boot..."
+sudo systemctl set-default graphical.target
+sudo raspi-config nonint do_boot_behaviour B4
+
 echo ">>> Enabling MQTT and DHCP services..."
 sudo systemctl enable dnsmasq
 sudo systemctl enable mosquitto
@@ -135,10 +139,6 @@ EOF'
 echo ">>> Enabling boot_update.service..."
 sudo systemctl daemon-reexec
 sudo systemctl enable boot_update.service
-
-echo ">>> Enabling GUI auto login on boot..."
-sudo systemctl set-default graphical.target
-sudo raspi-config nonint do_boot_behaviour B4
 
 echo ">>> Setup complete! Rebooting..."
 sudo reboot
