@@ -29,10 +29,13 @@ active_time_bucket_index = -1
 previous_time_bucket_index = -1
 
 
-def main():
+def main(shared_state):
     """
     Entry point for the machine_handler node. Sets up MQTT subscriptions and starts the event loop.
     """
+    global master_active_schedule
+    master_active_schedule = shared_state  # Use the shared state
+
     # Subscribe to the internal handler topic for machine updates and requests
     mqtt.subscribe(HANDLER_TOPIC_INTERNAL, processInternalMessageIngress)
 
