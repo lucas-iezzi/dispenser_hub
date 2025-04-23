@@ -64,12 +64,12 @@ echo ">>> Creating boot_update.sh script..."
 cat <<'EOF' > /home/pi/boot_update.sh
 #!/bin/bash
 
-LOG="/home/engineering/boot_update.log"
+LOG="/home/pi/boot_update.log"
 echo "Boot update started at $(date)" >> $LOG
 
 # Activate the Python virtual environment
 echo "Activating Python virtual environment..." >> $LOG
-source /home/engineering/venv/bin/activate
+source /home/pi/venv/bin/activate
 
 # Wait for a usable Wi-Fi IP address
 MAX_WAIT=60
@@ -108,7 +108,7 @@ while true; do
 done
 
 # Pull latest updates from GitHub
-cd /home/engineering/dispenser_hub || exit 1
+cd /home/pi/dispenser_hub || exit 1
 
 # Ensure the origin remote is set correctly
 if ! git remote -v | grep -q "https://github.com/lucas-iezzi/dispenser_hub.git"; then
