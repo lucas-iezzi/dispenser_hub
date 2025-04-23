@@ -6,8 +6,17 @@ echo ">>> Updating and installing system dependencies..."
 sudo apt update
 sudo apt install -y git dnsmasq mosquitto mosquitto-clients python3-pip
 
-echo ">>> Installing Python dependencies (paho-mqtt, pydantic)..."
-pip3 install --upgrade --break-system-packages paho-mqtt pydantic || echo "Ignoring pip errors due to system-wide installation restrictions."
+echo ">>> Creating Python virtual environment..."
+VENV_PATH="/home/pi/dispenser_venv"
+if [ ! -d "$VENV_PATH" ]; then
+  python3 -m venv "$VENV_PATH"
+fi
+
+echo ">>> Installing Python dependencies into virtual environment..."
+source "$VENV_PATH/bin/activate"
+pip install --upgrade pip
+pip install paho-mqtt pydantic
+deactivate
 
 echo ">>> Enabling services to start on boot..."
 sudo systemctl enable dnsmasq
@@ -70,6 +79,9 @@ cat <<'EOF' > /home/pi/boot_update.sh
 
 LOG="/home/pi/boot_update.log"
 echo "Boot update started at $(date)" >> $LOG
+
+# Activate virtual environment
+source /home/pi/dispenser_venv/bin/activate
 
 # Wait for a usable Wi-Fi IP address
 MAX_WAIT=60
