@@ -6,17 +6,9 @@ echo ">>> Updating and installing system dependencies..."
 sudo apt update
 sudo apt install -y git dnsmasq dhcpcd5 mosquitto mosquitto-clients python3-pip rfkill
 
-echo ">>> Handling RF-kill (Unblocking Network Interfaces)..."
-# Check and unblock all interfaces
-rfkill list
-sudo rfkill unblock all
-
-echo ">>> Setting up Python virtual environment..."
-python3 -m venv /home/pi/venv
-source /home/pi/venv/bin/activate
-
 echo ">>> Installing Python dependencies (paho-mqtt, pydantic)..."
-pip install --upgrade paho-mqtt pydantic
+# Install Python dependencies system-wide, ignoring errors
+pip3 install --upgrade --break-system-packages paho-mqtt pydantic || echo "Ignoring pip errors due to system-wide installation restrictions."
 
 echo ">>> Enabling VNC..."
 sudo raspi-config nonint do_vnc 0
@@ -72,10 +64,6 @@ cat <<'EOF' > /home/pi/boot_update.sh
 LOG="/home/pi/boot_update.log"
 echo "Boot update started at $(date)" >> $LOG
 
-# Activate the Python virtual environment
-echo "Activating Python virtual environment..." >> $LOG
-source /home/pi/venv/bin/activate
-
 # Wait for a usable Wi-Fi IP address
 MAX_WAIT=60
 ELAPSED=0
@@ -87,7 +75,7 @@ while true; do
   fi
   if (( ELAPSED >= MAX_WAIT )); then
     echo "Timeout waiting for good Wi-Fi IP. Skipping update." >> $LOG
-    exit 1
+    break  # Allow the system to continue booting
   fi
   sleep 2
   ((ELAPSED+=2))
@@ -103,8 +91,8 @@ while true; do
     break
   fi
   if (( RETRY_COUNT >= MAX_RETRIES )); then
-    echo "Mosquitto service failed to start after $MAX_RETRIES attempts." >> $LOG
-    exit 1
+    echo "Mosquitto service failed to start after $MAX_RETRIES attempts. Continuing boot process." >> $LOG
+    break  # Allow the system to continue booting
   fi
   echo "Mosquitto service is not active. Attempting to start it... (Retry $((RETRY_COUNT + 1))/$MAX_RETRIES)" >> $LOG
   sudo systemctl start mosquitto
