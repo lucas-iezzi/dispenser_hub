@@ -14,12 +14,23 @@ sudo systemctl enable dnsmasq
 sudo systemctl enable mosquitto
 sudo systemctl start mosquitto
 
-echo ">>> Configuring static IP on eth0..."
-if ! grep -q "interface eth0" /etc/dhcpcd.conf; then
-  sudo bash -c 'echo -e "\ninterface eth0\nstatic ip_address=192.168.4.1/24" >> /etc/dhcpcd.conf'
-else
-  echo "Static IP for eth0 already configured."
+echo ">>> Configuring static IP on eth0 using NetworkManager..."
+ETH_CONN=$(nmcli -t -f NAME,DEVICE con show --active | grep ':eth0' | cut -d: -f1)
+
+if [ -z "$ETH_CONN" ]; then
+  echo "No active Ethernet connection found. Creating one..."
+  sudo nmcli con add type ethernet ifname eth0 con-name eth0-static
+  ETH_CONN="eth0-static"
 fi
+
+# Configure static IP
+sudo nmcli con modify "$ETH_CONN" ipv4.addresses 192.168.4.1/24
+sudo nmcli con modify "$ETH_CONN" ipv4.method manual
+sudo nmcli con modify "$ETH_CONN" connection.autoconnect yes
+
+# Bring connection up
+sudo nmcli con up "$ETH_CONN"
+
 
 echo ">>> Configuring dnsmasq for Ethernet DHCP..."
 if ! grep -q "interface=eth0" /etc/dnsmasq.conf; then
