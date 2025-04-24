@@ -351,7 +351,7 @@ def handle_schedule_request(request: REQUEST):
     """
     try:
         # Determine the requested date
-        date = datetime.fromtimestamp(request.timestamp).strftime("%Y-%m-%d")
+        date = request.date if request.date else datetime.fromtimestamp(request.timestamp).strftime("%Y-%m-%d")
         current_date = datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d")
         
         # Load the appropriate schedule
