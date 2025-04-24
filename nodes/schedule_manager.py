@@ -93,19 +93,23 @@ def load_master_schedule(date: str) -> list:
     """
     filename = f"{date}_schedule.json"
     if os.path.exists(filename):
-        with open(filename, "r") as file:
-            # Convert stored dictionaries back into MACHINE objects
-            raw_schedule = json.load(file)
-            schedule = []
-            for time_bucket in raw_schedule:
-                timestamp = time_bucket[0]
-                machines = [MACHINE(**m) for m in time_bucket[1:]]
-                schedule.append([timestamp] + machines)
-            return schedule
+        try:
+            with open(filename, "r") as file:
+                # Load the raw JSON data
+                raw_schedule = json.load(file)
+                schedule = []
+                for time_bucket in raw_schedule:
+                    timestamp = time_bucket[0]
+                    # Convert dictionaries back into MACHINE objects
+                    machines = [MACHINE(**m) if isinstance(m, dict) else m for m in time_bucket[1:]]
+                    schedule.append([timestamp] + machines)
+                return schedule
+        except Exception as e:
+            logger.error(f"Failed to load master schedule for {date}: {e}")
+            raise
     else:
         # Generate a blank schedule if the file does not exist
         return generate_blank_schedule(date)
-
 
 def save_master_schedule(schedule: list, date: str) -> bool:
     """
@@ -118,9 +122,12 @@ def save_master_schedule(schedule: list, date: str) -> bool:
             raw_schedule = []
             for time_bucket in schedule:
                 timestamp = time_bucket[0]
-                machines = [m.dict() for m in time_bucket[1:]]
+                # Ensure all MACHINE objects are converted to dictionaries
+                machines = [m.dict() if isinstance(m, MACHINE) else m for m in time_bucket[1:]]
                 raw_schedule.append([timestamp] + machines)
-            json.dump(raw_schedule, file)
+            # Save the JSON data
+            json.dump(raw_schedule, file, indent=4)  # Use indent=4 for readability
+
         logger.info(f"Master schedule for {date} saved successfully.")
         return True
     except Exception as e:
