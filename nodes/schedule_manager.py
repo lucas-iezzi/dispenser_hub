@@ -416,6 +416,7 @@ async def incoming_message_processor(message: str):
     """
     Handle incoming messages on the internal/manager topic.
     """
+    logger.info(f"Received message: {message}") 
     try:
         try:
             # Parse as SESSION
