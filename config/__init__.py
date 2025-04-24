@@ -1,5 +1,6 @@
 #config/__init__.py
 
+from .mqtt_config import MQTTConfig
 from .topics import (
     MANAGER_TOPIC,
     HANDLER_TOPIC_INTERNAL,
