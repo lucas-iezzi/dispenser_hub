@@ -19,7 +19,7 @@ from nodes import load_master_schedule, save_master_schedule
 selfNode = Node.HANDLER
 
 # Initialize the logger
-logger = get_logger(selfNode)
+logger = get_logger("MachineHandler")
 
 # Shared dictionary for today_schedule
 manager = Manager()
