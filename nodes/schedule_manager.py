@@ -412,7 +412,7 @@ def handle_session_request(request: REQUEST):
     except Exception as e:
         logger.error(f"Failed to handle session request: {e}")
 
-async def incoming_message_processor(message: str):
+async def incoming_message_processor(topic: str, message: str):
     """
     Handle incoming messages on the internal/manager topic.
     """
