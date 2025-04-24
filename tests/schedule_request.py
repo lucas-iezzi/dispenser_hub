@@ -8,7 +8,6 @@ def on_kiosk_message(client, userdata, message):
     print(f"Received on {message.topic}: {message.payload.decode()}")
 
 def main():
-
     # Subscribe to KIOSK_TOPIC to receive the schedule
     mqtt.subscribe(KIOSK_TOPIC, on_kiosk_message)
 
@@ -17,7 +16,8 @@ def main():
         "request_type": Request.SCHEDULE.value,
         "timestamp": time.time(),
         "origin_node": Node.KIOSK.value,
-        "destination_node": Node.MANAGER.value
+        "destination_node": Node.MANAGER.value,
+        "date": "2025-04-25"  # Optional: Specify the date for the schedule
     }
 
     # Publish the schedule request to MANAGER_TOPIC
