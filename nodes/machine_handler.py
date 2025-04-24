@@ -62,10 +62,6 @@ def main(shared_state):
 
     # Schedule the run_event_loop coroutine
     loop.create_task(run_event_loop())
-
-    # Start the event loop if it's a new one
-    if not loop.is_running():
-        loop.run_forever()
     
 async def run_event_loop():
     """
