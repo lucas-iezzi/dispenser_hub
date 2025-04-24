@@ -13,6 +13,7 @@ from config import (
 from utils import MACHINE, CONFIRMATION
 from utils import get_logger
 from utils import Node
+from nodes import load_master_schedule, save_master_schedule
 
 # Define the current node
 selfNode = Node.HANDLER
@@ -36,11 +37,35 @@ def main(shared_state):
     global master_active_schedule
     master_active_schedule = shared_state  # Use the shared state
 
+    # Check if today's schedule exists in the shared variable
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    if current_date not in master_active_schedule:
+        logger.info(f"Today's schedule not found in shared state. Attempting to load from file.")
+        # Attempt to load the schedule from file
+        schedule = load_master_schedule(current_date)
+        master_active_schedule[current_date] = schedule
+        save_master_schedule(schedule, current_date)  # Save the schedule to ensure it exists on disk
+    else:
+        logger.info(f"Today's schedule already exists in shared state. Skipping file load.")
+
     # Subscribe to the internal handler topic for machine updates and requests
     mqtt.subscribe(HANDLER_TOPIC_INTERNAL, processInternalMessageIngress)
 
-    # Start the asyncio event loop
-    asyncio.run(run_event_loop())
+    # Check if an event loop is already running
+    try:
+        loop = asyncio.get_running_loop()
+        logger.info("Using the existing event loop.")
+    except RuntimeError:
+        logger.info("No existing event loop found. Creating a new one.")
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    # Schedule the run_event_loop coroutine
+    loop.create_task(run_event_loop())
+
+    # Start the event loop if it's a new one
+    if not loop.is_running():
+        loop.run_forever()
     
 async def run_event_loop():
     """
