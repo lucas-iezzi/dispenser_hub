@@ -89,9 +89,12 @@ async def run_event_loop():
 
 def load_master_schedule(date: str) -> list:
     """
-    Load the master schedule for a specific date from a JSON file.
+    Load the master schedule for a specific date from a JSON file in the schedules directory.
     """
-    filename = f"{date}_schedule.json"
+    # Construct the full file path
+    schedules_dir = "schedules"
+    filename = os.path.join(schedules_dir, f"{date}_schedule.json")
+
     if os.path.exists(filename):
         try:
             with open(filename, "r") as file:
@@ -100,38 +103,44 @@ def load_master_schedule(date: str) -> list:
                 schedule = []
                 for time_bucket in raw_schedule:
                     timestamp = time_bucket[0]
-                    # Convert dictionaries back into MACHINE objects
                     machines = [MACHINE(**m) if isinstance(m, dict) else m for m in time_bucket[1:]]
                     schedule.append([timestamp] + machines)
+                logger.info(f"Master schedule for {date} loaded successfully from {filename}.")
                 return schedule
         except Exception as e:
-            logger.error(f"Failed to load master schedule for {date}: {e}")
+            logger.error(f"Failed to load master schedule for {date} from {filename}: {e}")
             raise
     else:
+        logger.warning(f"Master schedule for {date} not found in {filename}. Generating a blank schedule.")
         # Generate a blank schedule if the file does not exist
         return generate_blank_schedule(date)
 
 def save_master_schedule(schedule: list, date: str) -> bool:
     """
-    Save the master schedule to a JSON file.
+    Save the master schedule to a JSON file in the schedules directory.
     """
-    filename = f"{date}_schedule.json"
+    # Ensure the schedules directory exists
+    schedules_dir = "schedules"
+    os.makedirs(schedules_dir, exist_ok=True)
+
+    # Construct the full file path
+    filename = os.path.join(schedules_dir, f"{date}_schedule.json")
+
     try:
         with open(filename, "w") as file:
             # Convert MACHINE objects to dictionaries for JSON storage
             raw_schedule = []
             for time_bucket in schedule:
                 timestamp = time_bucket[0]
-                # Ensure all MACHINE objects are converted to dictionaries
                 machines = [m.dict() if isinstance(m, MACHINE) else m for m in time_bucket[1:]]
                 raw_schedule.append([timestamp] + machines)
             # Save the JSON data
             json.dump(raw_schedule, file, indent=4)  # Use indent=4 for readability
 
-        logger.info(f"Master schedule for {date} saved successfully.")
+        logger.info(f"Master schedule for {date} saved successfully to {filename}.")
         return True
     except Exception as e:
-        logger.error(f"Failed to save master schedule for {date}: {e}")
+        logger.error(f"Failed to save master schedule for {date} to {filename}: {e}")
         return False
 
 def load_master_session_list() -> List[SESSION]:
