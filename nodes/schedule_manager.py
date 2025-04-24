@@ -7,7 +7,7 @@ import asyncio
 import time
 from typing import Optional, List, Tuple
 from datetime import datetime, timedelta
-from multiprocessing import Manager
+from multiprocessing import Manager, Event
 from mqtt import MQTTClient
 from config import MQTTConfig
 from config import MANAGER_TOPIC, KIOSK_TOPIC, ADMIN_TOPIC, RESERVATION_TOPIC, TOPIC_MAP

@@ -1,5 +1,5 @@
 import asyncio
-from multiprocessing import Manager, Process, Event, Queue
+from multiprocessing import Manager, Process, Event
 from nodes.schedule_manager import main as schedule_manager_main
 from nodes.machine_handler import main as machine_handler_main
 

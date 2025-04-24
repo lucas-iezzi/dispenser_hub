@@ -4,10 +4,10 @@ from utils.logger import get_logger
 from typing import Callable, Dict, Optional
 
 class MQTTClient:
-    def __init__(self, broker_host: str, broker_port: int, client_id: Optional[str] = None):
+    def __init__(self, broker_host: str, broker_port: int, client_id: str):
         self.broker_host = broker_host
         self.broker_port = broker_port
-        self.client_id = client_id or f"mqtt_client_{id(self)}"
+        self.client_id = client_id
         self.client = mqtt.Client(self.client_id)
         self.logger = get_logger(self.client_id)
         self._callbacks: Dict[str, Callable[[str, str], None]] = {}

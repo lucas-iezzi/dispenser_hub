@@ -3,7 +3,7 @@
 import asyncio
 import time
 from datetime import datetime
-from multiprocessing import Manager
+from multiprocessing import Manager, Event
 from mqtt import MQTTClient
 from config import MQTTConfig
 from config import (
