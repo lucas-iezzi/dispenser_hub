@@ -39,7 +39,7 @@ master_session_list = []
 # Define time bucket size in seconds (default: 5 minutes = 300 seconds)
 TIME_BUCKET_SIZE = 300
 
-def main(shared_state):
+def main(shared_state, loop):
     """
     Entry point for the schedule_manager node. Sets up MQTT subscriptions and starts the event loop.
     """
@@ -60,21 +60,9 @@ def main(shared_state):
     # Subscribe to the internal manager topic for session proposals and requests
     mqtt.subscribe(MANAGER_TOPIC, incoming_message_processor)
 
-    # Check if an event loop is already running
-    try:
-        loop = asyncio.get_running_loop()
-        logger.info("Using the existing event loop.")
-    except RuntimeError:
-        logger.info("No existing event loop found. Creating a new one.")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-    # Schedule the run_event_loop coroutine
+    # Add tasks to the shared event loop
     loop.create_task(run_event_loop())
-
-    # Start the event loop if it's a new one
-    if not loop.is_running():
-        loop.run_forever()
+    logger.info("Schedule Manager tasks added to the event loop.")
 
 
 async def run_event_loop():
