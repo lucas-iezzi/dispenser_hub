@@ -69,7 +69,6 @@ def main(shared_state, loop, ready_event):
     loop.create_task(run_event_loop())
     logger.info("Schedule Manager tasks added to the event loop.")
 
-
 async def run_event_loop():
     """
     Run the asyncio event loop and schedule tasks.
