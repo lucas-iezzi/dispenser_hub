@@ -27,15 +27,15 @@ mqtt.connect()
 # Define the current node
 selfNode = Node.MANAGER
 
-# Initialize the master schedule update queue
-# update_queue.put("schedule_updated")
-
 # Initialize the logger
 logger = get_logger("ScheduleManager")
 
 # Shared dictionary for today_schedule
 manager = Manager()
-master_active_schedule = manager.dict()
+master_schedule = manager.dict()
+
+# Initialize the master schedule update flag
+master_schedule_flag = Event()
 
 # Master list of all future sessions
 master_session_list = []
@@ -43,20 +43,22 @@ master_session_list = []
 # Define time bucket size in seconds (default: 5 minutes = 300 seconds)
 TIME_BUCKET_SIZE = 300
 
-def main(shared_state, update_queue, ready_event, loop):
+def main(shared_state, shared_state_flag, ready_event, loop):
     """
     Entry point for the schedule_manager node. Sets up MQTT subscriptions and starts the event loop.
     """
-    global master_active_schedule
-    master_active_schedule = shared_state  # Use the shared state
+    global master_schedule_flag  # Flag used to tell machine_handler when the master schedule has been updated
+    master_schedule_flag = shared_state_flag
+    global master_schedule
+    master_schedule = shared_state  # Use the shared state
 
     # Check if today's schedule exists in the shared variable
     current_date = datetime.now().strftime("%Y-%m-%d")
-    if current_date not in master_active_schedule:
+    if current_date not in master_schedule:
         logger.info(f"Today's schedule not found in shared state. Attempting to load from file.")
         # Attempt to load the schedule from file
         schedule = load_master_schedule(current_date)
-        master_active_schedule[current_date] = schedule
+        master_schedule[current_date] = schedule
         save_master_schedule(schedule, current_date)  # Save the schedule to ensure it exists on disk
     else:
         logger.info(f"Today's schedule already exists in shared state. Skipping file load.")
@@ -288,7 +290,7 @@ def handle_session_proposal(session: SESSION):
     """
     Handle a proposed session by checking availability and adding it to the schedule.
     """
-    global master_active_schedule
+    global master_schedule
 
     try:
 
@@ -301,7 +303,7 @@ def handle_session_proposal(session: SESSION):
         # Load the appropriate schedule
         if session_date == current_date:
             # Use the shared dictionary for today's schedule
-            schedule = master_active_schedule
+            schedule = master_schedule
             logger.info(f"Loaded today's schedule for session {session.session_id}")
         else:
             # Load the schedule from file for other dates
@@ -330,7 +332,7 @@ def handle_session_proposal(session: SESSION):
             save_master_session_list(master_session_list)
             # Update today's schedule if the session is for today
             if session_date == current_date:
-                master_active_schedule = schedule
+                master_schedule = schedule
                 logger.info(f"Updated today's schedule with session {session_date}")
         else:
             # Send CONFIRMATION that session failed to add
@@ -360,7 +362,7 @@ def handle_schedule_request(request: REQUEST):
         # Load the appropriate schedule
         if date == current_date:
             # Use the shared dictionary for today's schedule
-            schedule = master_active_schedule
+            schedule = master_schedule
         else:
             # Load the schedule from file for other dates
             schedule = load_master_schedule(date)

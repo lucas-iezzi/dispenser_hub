@@ -32,19 +32,24 @@ logger = get_logger("MachineHandler")
 
 # Shared dictionary for today_schedule
 manager = Manager()
-master_active_schedule = manager.dict()
+master_schedule = manager.dict()
+
+# Initialize the master schedule update flag
+master_schedule_flag = Event()
 
 # Active time bucket tracking
 active_time_bucket_index = -1
 previous_time_bucket_index = -1
 
 
-def main(shared_state, loop, ready_event):
+def main(shared_state, shared_state_flag, ready_event, loop):
     """
     Entry point for the machine_handler node. Sets up MQTT subscriptions and starts the event loop.
     """
-    global master_active_schedule
-    master_active_schedule = shared_state  # Use the shared state
+    global master_schedule_flag  # Flag used to tell machine_handler when the master schedule has been updated
+    master_schedule_flag = shared_state_flag
+    global master_schedule
+    master_schedule = shared_state  # Use the shared state
 
     # Wait for the schedule_manager to signal readiness
     logger.info("Waiting for Schedule Manager to be ready...")
@@ -53,11 +58,11 @@ def main(shared_state, loop, ready_event):
     
     # Check if today's schedule exists in the shared variable
     current_date = datetime.now().strftime("%Y-%m-%d")
-    if current_date not in master_active_schedule:
+    if current_date not in master_schedule:
         logger.info(f"Today's schedule not found in shared state. Attempting to load from file.")
         # Attempt to load the schedule from file
         schedule = load_master_schedule(current_date)
-        master_active_schedule[current_date] = schedule
+        master_schedule[current_date] = schedule
         save_master_schedule(schedule, current_date)  # Save the schedule to ensure it exists on disk
     else:
         logger.info(f"Today's schedule already exists in shared state. Skipping file load.")
@@ -71,17 +76,22 @@ def main(shared_state, loop, ready_event):
     
 async def run_event_loop():
     asyncio.create_task(monitor_active_time_bucket())
+    # asyncio.create_task(monitor_master_schedule())
     logger.info("Machine handler started and subscribed to topics.")
     
     # Keep the event loop alive forever
     await asyncio.Event().wait()
+
+# async def monitor_master_schedule():
+    # wait for the master_schedule_flag to indicate new content is available then check against previous content to see what machines to update
+    # may need to change active_time_bucket_index to store the whole active time bucket instead
 
 async def monitor_active_time_bucket():
     """
     Periodically check the current time and determine the active time bucket.
     Send MACHINE status change requests for machines whose statuses have changed.
     """
-    global master_active_schedule, active_time_bucket_index, previous_time_bucket_index
+    global master_schedule, active_time_bucket_index, previous_time_bucket_index
 
     while True:
         try:
@@ -90,12 +100,12 @@ async def monitor_active_time_bucket():
             current_date = datetime.fromtimestamp(now).strftime("%Y-%m-%d")
 
             # Check if the current day's schedule exists in the shared dictionary
-            if current_date not in master_active_schedule:
-                logger.warning(f"No schedule found for {current_date} in master_active_schedule.")
+            if current_date not in master_schedule:
+                logger.warning(f"No schedule found for {current_date} in master_schedule.")
                 await asyncio.sleep(1)
                 continue
 
-            today_schedule = master_active_schedule[current_date]
+            today_schedule = master_schedule[current_date]
 
             # Determine the active time bucket
             for i, time_bucket in enumerate(today_schedule):
@@ -186,8 +196,8 @@ async def incoming_message_processor_internal(topic: str, message: str):
 
         # Update the shared dictionary
         current_date = datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d")
-        if current_date in master_active_schedule:
-            today_schedule = master_active_schedule[current_date]
+        if current_date in master_schedule:
+            today_schedule = master_schedule[current_date]
             for time_bucket in today_schedule:
                 for idx, machine in enumerate(time_bucket[1:], start=1):
                     if machine.machine_id == machine_update.machine_id:
@@ -195,7 +205,7 @@ async def incoming_message_processor_internal(topic: str, message: str):
                         break
 
             # Update the shared dictionary
-            master_active_schedule[current_date] = today_schedule
+            master_schedule[current_date] = today_schedule
 
         # Forward the machine update
         mqtt.publish(machine_topic(machine_update.machine_id), machine_update.json())
