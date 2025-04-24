@@ -19,7 +19,7 @@ class MQTTClient:
         self.broker_port = broker_port
         self.client_id = client_id or f"mqtt_client_{id(self)}"
         self.client = mqtt.Client(self.client_id)
-        self.logger = get_logger(f"MQTTClient{client_id}")  # Use the common logger utility
+        self.logger = get_logger(f"{client_id}")  # Use the common logger utility
 
     def connect(self):
         """
