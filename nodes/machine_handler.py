@@ -38,7 +38,7 @@ active_time_bucket_index = -1
 previous_time_bucket_index = -1
 
 
-def main(shared_state, loop):
+def main(shared_state, loop, ready_event):
     """
     Entry point for the machine_handler node. Sets up MQTT subscriptions and starts the event loop.
     """
