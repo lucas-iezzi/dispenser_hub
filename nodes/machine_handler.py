@@ -4,7 +4,8 @@ import asyncio
 import time
 from datetime import datetime
 from multiprocessing import Manager
-from mqtt import mqtt
+from mqtt import MQTTClient
+from config import MQTTConfig
 from config import (
     HANDLER_TOPIC_INTERNAL,
     machine_topic,
@@ -14,6 +15,13 @@ from utils import MACHINE, CONFIRMATION
 from utils import get_logger
 from utils import Node
 from nodes import load_master_schedule, save_master_schedule
+
+#Initialize MQTT Broker
+mqtt = MQTTClient(
+    broker_host=MQTTConfig.BROKER_HOST,
+    broker_port=MQTTConfig.BROKER_PORT,
+    client_id="MachineHandlerMQTTClient"
+)
 
 # Define the current node
 selfNode = Node.HANDLER
