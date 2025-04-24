@@ -70,16 +70,12 @@ def main(shared_state, loop, ready_event):
     logger.info("Schedule Manager tasks added to the event loop.")
     
 async def run_event_loop():
-    """
-    Run the asyncio event loop and schedule tasks.
-    """
-    # Start the active time bucket monitor
     asyncio.create_task(monitor_active_time_bucket())
-
     logger.info("Machine handler started and subscribed to topics.")
+    
+    # Keep the event loop alive forever
+    await asyncio.Event().wait()
 
-    # Start the asyncio event loop to keep the node running
-    asyncio.get_event_loop().run_forever()
 
 
 async def monitor_active_time_bucket():
