@@ -45,6 +45,11 @@ def main(shared_state, loop):
     global master_active_schedule
     master_active_schedule = shared_state  # Use the shared state
 
+    # Wait for the schedule_manager to signal readiness
+    logger.info("Waiting for Schedule Manager to be ready...")
+    ready_event.wait()
+    logger.info("Schedule Manager is ready. Starting Machine Handler.")
+    
     # Check if today's schedule exists in the shared variable
     current_date = datetime.now().strftime("%Y-%m-%d")
     if current_date not in master_active_schedule:
