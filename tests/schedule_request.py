@@ -9,7 +9,7 @@ from config import MANAGER_TOPIC, KIOSK_TOPIC
 mqtt = MQTTClient(
     broker_host=MQTTConfig.BROKER_HOST,
     broker_port=MQTTConfig.BROKER_PORT,
-    client_id="ScheduleTestMQTTClient"
+    client_id="TestMQTTClient"
 )
 
 def on_kiosk_message(client, userdata, message):
