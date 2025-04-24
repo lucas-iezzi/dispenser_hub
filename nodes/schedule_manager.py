@@ -39,7 +39,7 @@ master_session_list = []
 # Define time bucket size in seconds (default: 5 minutes = 300 seconds)
 TIME_BUCKET_SIZE = 300
 
-def main(shared_state, loop):
+def main(shared_state, loop, ready_event):
     """
     Entry point for the schedule_manager node. Sets up MQTT subscriptions and starts the event loop.
     """
@@ -59,6 +59,10 @@ def main(shared_state, loop):
 
     # Subscribe to the internal manager topic for session proposals and requests
     mqtt.subscribe(MANAGER_TOPIC, incoming_message_processor)
+
+    # Signal that the schedule_manager is ready
+    ready_event.set()
+    logger.info("Schedule Manager is ready.")
 
     # Add tasks to the shared event loop
     loop.create_task(run_event_loop())
