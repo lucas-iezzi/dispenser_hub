@@ -1,8 +1,16 @@
 import json
 import time
-from mqtt import mqtt
-from utils.enums import Node, Request
-from config.topics import MANAGER_TOPIC, KIOSK_TOPIC
+from mqtt import MQTTClient
+from config import MQTTConfig
+from utils import Node, Request
+from config import MANAGER_TOPIC, KIOSK_TOPIC
+
+#Initialize MQTT Broker
+mqtt = MQTTClient(
+    broker_host=MQTTConfig.BROKER_HOST,
+    broker_port=MQTTConfig.BROKER_PORT,
+    client_id="ScheduleTestMQTTClient"
+)
 
 def on_kiosk_message(client, userdata, message):
     print(f"Received on {message.topic}: {message.payload.decode()}")
