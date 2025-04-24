@@ -76,8 +76,6 @@ async def run_event_loop():
     # Keep the event loop alive forever
     await asyncio.Event().wait()
 
-
-
 async def monitor_active_time_bucket():
     """
     Periodically check the current time and determine the active time bucket.
