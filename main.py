@@ -1,3 +1,4 @@
+import asyncio
 from multiprocessing import Manager, Process
 from nodes.schedule_manager import main as schedule_manager
 from nodes.machine_handler import main as machine_handler
