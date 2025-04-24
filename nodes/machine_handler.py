@@ -63,7 +63,7 @@ def main(shared_state, loop, ready_event):
         logger.info(f"Today's schedule already exists in shared state. Skipping file load.")
 
     # Subscribe to the internal handler topic for machine updates and requests
-    mqtt.subscribe(HANDLER_TOPIC_INTERNAL, processInternalMessageIngress)
+    mqtt.subscribe(HANDLER_TOPIC_INTERNAL, incoming_message_processor_internal)
 
     # Add tasks to the shared event loop
     loop.create_task(run_event_loop())
@@ -180,7 +180,7 @@ def generate_exchange_id() -> int:
     return int(time.time() * 1000)
 
 
-async def processInternalMessageIngress(topic: str, message: str):
+async def incoming_message_processor_internal(topic: str, message: str):
     """
     Callback for messages received on HANDLER_TOPIC_INTERNAL.
     Handles machine updates and requests for machine information.
