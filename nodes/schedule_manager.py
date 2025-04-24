@@ -27,6 +27,9 @@ mqtt.connect()
 # Define the current node
 selfNode = Node.MANAGER
 
+# Initialize the master schedule update queue
+# update_queue.put("schedule_updated")
+
 # Initialize the logger
 logger = get_logger("ScheduleManager")
 
@@ -40,7 +43,7 @@ master_session_list = []
 # Define time bucket size in seconds (default: 5 minutes = 300 seconds)
 TIME_BUCKET_SIZE = 300
 
-def main(shared_state, loop, ready_event):
+def main(shared_state, update_queue, ready_event, loop):
     """
     Entry point for the schedule_manager node. Sets up MQTT subscriptions and starts the event loop.
     """
