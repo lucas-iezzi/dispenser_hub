@@ -38,7 +38,7 @@ active_time_bucket_index = -1
 previous_time_bucket_index = -1
 
 
-def main(shared_state):
+def main(shared_state, loop):
     """
     Entry point for the machine_handler node. Sets up MQTT subscriptions and starts the event loop.
     """
@@ -59,17 +59,9 @@ def main(shared_state):
     # Subscribe to the internal handler topic for machine updates and requests
     mqtt.subscribe(HANDLER_TOPIC_INTERNAL, processInternalMessageIngress)
 
-    # Check if an event loop is already running
-    try:
-        loop = asyncio.get_running_loop()
-        logger.info("Using the existing event loop.")
-    except RuntimeError:
-        logger.info("No existing event loop found. Creating a new one.")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-    # Schedule the run_event_loop coroutine
+    # Add tasks to the shared event loop
     loop.create_task(run_event_loop())
+    logger.info("Schedule Manager tasks added to the event loop.")
     
 async def run_event_loop():
     """
