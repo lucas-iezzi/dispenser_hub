@@ -180,7 +180,7 @@ def generate_exchange_id() -> int:
     return int(time.time() * 1000)
 
 
-async def processInternalMessageIngress(message: str):
+async def processInternalMessageIngress(topic: str, message: str):
     """
     Callback for messages received on HANDLER_TOPIC_INTERNAL.
     Handles machine updates and requests for machine information.
