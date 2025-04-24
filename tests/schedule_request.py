@@ -11,6 +11,7 @@ mqtt = MQTTClient(
     broker_port=MQTTConfig.BROKER_PORT,
     client_id="TestMQTTClient"
 )
+mqtt.connect()
 
 def on_kiosk_message(client, userdata, message):
     print(f"Received on {message.topic}: {message.payload.decode()}")
