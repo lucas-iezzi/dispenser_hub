@@ -7,6 +7,7 @@ from utils.enums import Status, BallLevel, Request, Node
 class REQUEST(BaseModel):
     '''Generic request to receive the specified information from a node'''
     request_type: Request  # The type of request (e.g., SCHEDULE, SESSION, MACHINE)
+    date: Optional[str] = None  # The date for which the schedule is being requested (optional)
     machine_id: Optional[int] = None  # The ID of the machine being requested (if applicable)
     session_id: Optional[int] = None  # The ID of the session being requested (if applicable)
 
