@@ -19,14 +19,14 @@ def main():
         # Start the schedule_manager process
         schedule_manager_process = Process(
             target=schedule_manager_main,
-            args=(shared_state, update_queue, schedule_manager_ready)
+            args=(shared_state, update_queue, schedule_manager_ready, loop)  # Pass loop here
         )
         schedule_manager_process.start()
 
         # Start the machine_handler process (waits for schedule_manager_ready)
         machine_handler_process = Process(
             target=machine_handler_main,
-            args=(shared_state, update_queue, schedule_manager_ready)
+            args=(shared_state, update_queue, schedule_manager_ready, loop)  # Pass loop here
         )
         machine_handler_process.start()
 
