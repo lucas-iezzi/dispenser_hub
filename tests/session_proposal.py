@@ -1,8 +1,16 @@
 import json
 import time
-from mqtt import mqtt
+from mqtt import MQTTClient
+from config import MQTTConfig
 from utils.enums import Node, Status
 from config.topics import MANAGER_TOPIC, KIOSK_TOPIC
+
+#Initialize MQTT Broker
+mqtt = MQTTClient(
+    broker_host=MQTTConfig.BROKER_HOST,
+    broker_port=MQTTConfig.BROKER_PORT,
+    client_id="TestMQTTClient"
+)
 
 # Flag to indicate confirmation received
 confirmation_received = False
