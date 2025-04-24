@@ -2,7 +2,7 @@
 
 import asyncio
 import time
-import datetime
+from datetime import datetime
 from multiprocessing import Manager
 from mqtt import mqtt
 from config import (
