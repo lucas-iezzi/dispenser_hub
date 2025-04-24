@@ -22,6 +22,7 @@ mqtt = MQTTClient(
     broker_port=MQTTConfig.BROKER_PORT,
     client_id="MachineHandlerMQTTClient"
 )
+mqtt.connect()
 
 # Define the current node
 selfNode = Node.HANDLER
