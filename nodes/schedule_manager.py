@@ -8,12 +8,20 @@ import time
 from typing import Optional, List, Tuple
 from datetime import datetime, timedelta
 from multiprocessing import Manager
-from mqtt import mqtt
+from mqtt import MQTTClient
+from config import MQTTConfig
 from config import MANAGER_TOPIC, KIOSK_TOPIC, ADMIN_TOPIC, RESERVATION_TOPIC, TOPIC_MAP
 from config import machine_id_list
 from utils import SESSION, SCHEDULE, CONFIRMATION, REQUEST, MACHINE
 from utils import get_logger
 from utils import Status, Node, Request
+
+#Initialize MQTT Broker
+mqtt = MQTTClient(
+    broker_host=MQTTConfig.BROKER_HOST,
+    broker_port=MQTTConfig.BROKER_PORT,
+    client_id="ScheduleManagerMQTTClient"
+)
 
 # Define the current node
 selfNode = Node.MANAGER
