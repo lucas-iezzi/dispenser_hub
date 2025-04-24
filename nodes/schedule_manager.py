@@ -19,7 +19,7 @@ from utils import Status, Node, Request
 selfNode = Node.MANAGER
 
 # Initialize the logger
-logger = get_logger(selfNode)
+logger = get_logger("ScheduleManager")
 
 # Shared dictionary for today_schedule
 manager = Manager()
