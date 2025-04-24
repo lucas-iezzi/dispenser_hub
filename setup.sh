@@ -119,16 +119,14 @@ while true; do
   ((RETRY_COUNT++))
 done
 
-# Pull latest updates from GitHub
-cd /home/pi/dispenser_hub || exit 1
-
-# Ensure the origin remote is set correctly
-if ! git remote -v | grep -q "https://github.com/lucas-iezzi/dispenser_hub.git"; then
-  git remote add origin https://github.com/lucas-iezzi/dispenser_hub.git
+# Delete and clone fresh copy of dispenser_hub
+echo "Refreshing GitHub repo..." >> $LOG
+rm -rf /home/pi/dispenser_hub
+if git clone https://github.com/lucas-iezzi/dispenser_hub.git /home/pi/dispenser_hub >> $LOG 2>&1; then
+  echo "Cloned latest code at $(date)" >> $LOG
+else
+  echo "Failed to clone repository." >> $LOG
 fi
-
-git pull >> $LOG 2>&1
-echo "Git update completed at $(date)" >> $LOG
 EOF
 
 chmod +x /home/pi/boot_update.sh
@@ -152,6 +150,9 @@ WantedBy=multi-user.target
 EOF'
 
 echo ">>> Adding virtual environment activation to .bashrc..."
+if ! grep -q "source /home/pi/dispenser_venv/bin/activate" /home/pi/.bashrc; then
+  echo "source /home/pi/dispenser_venv/bin/activate" >> /home/pi/.bashrc
+fi
 
 echo ">>> Enabling boot_update.service..."
 sudo systemctl daemon-reexec
