@@ -11,6 +11,7 @@ mqtt = MQTTClient(
     broker_port=MQTTConfig.BROKER_PORT,
     client_id="TestMQTTClient"
 )
+mqtt.connect()
 
 # Flag to indicate confirmation received
 confirmation_received = False
