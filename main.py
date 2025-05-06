@@ -8,7 +8,7 @@ def main():
     with Manager() as manager:
         shared_state = manager.dict()
         shared_state_flag = Event()
-        update_queue = Queue()
+        # update_queue = Queue()
 
         # Create an event to synchronize the processes
         schedule_manager_ready = Event()
