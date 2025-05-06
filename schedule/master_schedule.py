@@ -1,37 +1,59 @@
 # schedule/master_schedule.py
 
 from threading import Lock
+from datetime import datetime
+from typing import List, Dict, Any
+from utils.logger import get_logger
 
-# The shared master schedule dictionary
-master_schedule = {}
+from schedule.file_io import load_schedule_from_disk, save_schedule_to_disk
+
+logger = get_logger("master_schedule")
+
+# Shared master schedule dictionary and lock
+master_schedule: Dict[str, List[list]] = {}
 _schedule_lock = Lock()
+_today_changed = False
 
-# Simple boolean flag to indicate schedule change
-_schedule_changed = False
-
-def get_master_schedule():
+def get_master_schedule(date: str) -> List[list]:
     with _schedule_lock:
-        return master_schedule.copy()
+        try:
+            # If schedule currently loaded
+            return master_schedule[date].copy()
+        except:
+            # Otherwise load schedule
+            logger.info("Date does not exist in master schedule. Pulling from disk")
+            master_schedule[date] = load_schedule_from_disk(date)
+            return master_schedule[date].copy()
 
-def set_master_schedule(new_schedule: dict):
-    global master_schedule, _schedule_changed
+def update_master_schedule(date: str, new_schedule: List[list]):
+    global master_schedule, _today_changed
     with _schedule_lock:
-        master_schedule = new_schedule
-        _schedule_changed = True
-
-def update_schedule_entry(bucket_time: str, machine_id: str, session_data: dict):
-    global _schedule_changed
-    with _schedule_lock:
-        if bucket_time not in master_schedule:
-            master_schedule[bucket_time] = {}
-        master_schedule[bucket_time][machine_id] = session_data
-        _schedule_changed = True
+        try:
+            # Save the new schedule to the shared dict and to appropriate file on disk
+            master_schedule[date] = new_schedule
+            save_schedule_to_disk(date, new_schedule)
+            
+            # Raise the update flag if schedule changed is today
+            today_date = datetime.now().strftime("%Y-%m-%d")
+            if today_date == date:
+                _today_changed = True
+                logger.debug("Master schedule updated for today. Flag set.")
+            else:
+                logger.debug("Master schedule updated.")
+            
+        except:
+            logger.error("Master schedule failed to update.")
 
 def get_schedule_flag() -> bool:
     with _schedule_lock:
-        return _schedule_changed
+        return _today_changed
 
 def clear_schedule_flag():
-    global _schedule_changed
+    global _today_changed
     with _schedule_lock:
-        _schedule_changed = False
+        _today_changed = False
+        logger.debug("Machines updated to match schedule. Update flag cleared.")
+
+def clear_past_schedules():
+    ### This function should run periodically, maybe every day or so and pop master_schedule entries with a date that has already passed.
+    pass
