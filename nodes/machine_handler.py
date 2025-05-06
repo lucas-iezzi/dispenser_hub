@@ -41,7 +41,6 @@ master_schedule_flag = Event()
 active_time_bucket_index = -1
 previous_time_bucket_index = -1
 
-
 def main(shared_state, shared_state_flag, ready_event, loop):
     """
     Entry point for the machine_handler node. Sets up MQTT subscriptions and starts the event loop.
