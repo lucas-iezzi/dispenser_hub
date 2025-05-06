@@ -66,13 +66,13 @@ def main(shared_state, shared_state_flag, ready_event, loop):
     # Subscribe to the internal manager topic for session proposals and requests
     mqtt.subscribe(MANAGER_TOPIC, incoming_message_processor)
 
-    # Signal that the schedule_manager is ready
-    ready_event.set()
-    logger.info("Schedule Manager is ready.")
-
     # Add tasks to the shared event loop
     loop.create_task(run_event_loop())
     logger.info("Schedule Manager tasks added to the event loop.")
+
+    # Signal that the schedule_manager is ready
+    ready_event.set()
+    logger.info("Schedule Manager is ready.")
 
 async def run_event_loop():
     """
