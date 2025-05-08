@@ -1,17 +1,10 @@
 #config/__init__.py
 
 from .mqtt_config import MQTTConfig
-from .topics import (
-    MANAGER_TOPIC,
-    HANDLER_TOPIC_INTERNAL,
-    KIOSK_TOPIC,
-    RESERVATION_TOPIC,
-    ADMIN_TOPIC,
-    MACHINE_TOPIC_BASE,
-    HANDLER_TOPIC_EXTERNAL,
-    machine_topic,
-    TOPIC_MAP
-)
-from .range import (
-    machine_id_list
+from .topics import Topics
+from .settings import (
+    MACHINE_ID_LIST,
+    MACHINE_LAYOUT,
+    TIME_BUCKET_SIZE,
+    BUFFER_SIZE
 )

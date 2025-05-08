@@ -13,11 +13,11 @@ class REQUEST(BaseModel):
 
     exchange_id: Optional[int] = None  # Unique ID for tracking the request/response exchange
     timestamp: float = Field(default_factory=lambda: time.time())  # Time when the request was created
-    origin_node: Node  # The node that initiated the request
-    destination_node: Node  # The node that should handle the request
+    origin_node: Optional[Node] = None  # The node that initiated the request
+    destination_node: Optional[Node] = None  # The node that should handle the request
 
 
-class CONFIRMATION(BaseModel):
+class ACKNOWLEDGE(BaseModel):
     '''Generic acknowledgement to confirm commands or updates were received'''
     success: bool  # Indicates whether the operation was successful
     message: Optional[str] = None  # Optional message providing additional information about the confirmation
@@ -27,8 +27,8 @@ class CONFIRMATION(BaseModel):
 
     exchange_id: Optional[int] = None  # Unique ID for tracking the confirmation exchange
     timestamp: float = Field(default_factory=lambda: time.time())  # Time when the confirmation was created
-    origin_node: Node  # The node that sent the confirmation
-    destination_node: Node  # The node that should receive the confirmation
+    origin_node: Optional[Node] = None  # The node that sent the confirmation
+    destination_node: Optional[Node] = None  # The node that should receive the confirmation
 
 
 class SESSION(BaseModel):
@@ -42,8 +42,8 @@ class SESSION(BaseModel):
 
     exchange_id: Optional[int] = None  # Unique ID for tracking the session exchange
     timestamp: float = Field(default_factory=lambda: time.time())  # Time when the session message was created
-    origin_node: Node  # The node that created the session
-    destination_node: Node  # The node that should handle the session
+    origin_node: Optional[Node] = None  # The node that created the session
+    destination_node: Optional[Node] = None  # The node that should handle the session
 
     @validator("machine_id", pre=True)
     def ensure_list(cls, v):
@@ -58,8 +58,8 @@ class SCHEDULE(BaseModel):
 
     exchange_id: Optional[int] = None  # Unique ID for tracking the schedule exchange
     timestamp: float = Field(default_factory=lambda: time.time())  # Time when the schedule message was created
-    origin_node: Node  # The node that created the schedule
-    destination_node: Node  # The node that should handle the schedule
+    origin_node: Optional[Node] = None  # The node that created the schedule
+    destination_node: Optional[Node] = None  # The node that should handle the schedule
 
 
 class MACHINE(BaseModel):

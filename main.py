@@ -1,34 +1,30 @@
-from multiprocessing import Manager, Process, Event
-from nodes.schedule_manager import main as schedule_manager_main
-from nodes.machine_handler import main as machine_handler_main
+# main.py
+from schedule.manager import start as start_manager
 
-def main():
-    with Manager() as manager:
-        # Create a Manager to handle shared state
-        shared_state = manager.dict()
-        shared_state_flag = Event()
-        schedule_manager_ready = Event()
+if __name__ == "__main__":
+    start_manager()
 
-        # Start schedule_manager process
-        schedule_manager_process = Process(
-            target=schedule_manager_main,
-            args=(shared_state, shared_state_flag, schedule_manager_ready)
-        )
-        schedule_manager_process.start()
 
-        # Start machine_handler process
-        machine_handler_process = Process(
-            target=machine_handler_main,
-            args=(shared_state, shared_state_flag, schedule_manager_ready)
-        )
-        machine_handler_process.start()
+"""
+In the Future...
 
-        try:
-            schedule_manager_process.join()
-            machine_handler_process.join()
-        except KeyboardInterrupt:
-            print("Shutting down...")
-        finally:
-            # Shut down the system cleanly
-            schedule_manager_process.terminate()
-            machine_handler_process.terminate()
+from multiprocessing import Process
+from schedule.manager import start as start_manager
+from machine.schedule_monitor import start as start_monitor
+
+if __name__ == "__main__":
+    p1 = Process(target=start_manager)
+    p2 = Process(target=start_monitor)
+    p1.start()
+    p2.start()
+    p1.join()
+    p2.join()
+
+
+Or...
+
+Use Docker Compose with each module as a container
+or
+Supervisor, Systemd, or PM2 to manage Python scripts as services
+
+"""

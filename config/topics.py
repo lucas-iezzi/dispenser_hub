@@ -1,49 +1,60 @@
 from utils import Node
 
-# === Internal Topics ===
+class Topics:
 
-# Schedule manager receives new sessions and requests for schedule or status through this topic
-MANAGER_TOPIC = "internal/manager"
+    # === Internal Topics ===
 
-# Machine handler receives machine updates and requests for machine info through this topic
-HANDLER_TOPIC_INTERNAL = "internal/handler"
+    MANAGER_PROPOSE_SESSION = "internal/manager/propose/session"
+    MANAGER_REQUEST_SESSION = "internal/manager/request/session"
 
-# Kiosk interface receives requested sessions and schedules, as well as confirmations for new sessions through this topic
-KIOSK_TOPIC = "internal/kiosk"
+    MACHINE_UPDATE_INTERNAL = "internal/machine/update"
+    MACHINE_ACK_INTERNAL = "internal/machine/acknowledge"
+    MACHINE_ALERT_INTERNAL = "internal/machine/alert"
 
-# Reservation interface receives requested sessions and schedules, as well as confirmations for new sessions through this topic
-RESERVATION_TOPIC = "internal/reservation"
+    KIOSK_SESSION_ACK = "internal/kiosk/acknowledge/session"
+    KIOSK_SESSION_RESPONSE = "internal/kiosk/response/session"
+    KIOSK_SCHEDULE_RESPONSE = "internal/kiosk/response/schedule"
 
-# Admin portal receives requested sessions and schedules, as well as confirmations for session changes and requested machine info through this topic
-ADMIN_TOPIC = "internal/admin"
+    RESERVATION_SESSION_ACK = "internal/reservation/acknowledge/session"
+    RESERVATION_SESSION_RESPONSE = "internal/reservation/response/session"
+    RESERVATION_SCHEDULE_RESPONSE = "internal/reservation/response/schedule"
 
+    ADMIN_SESSION_ACK = "internal/admin/acknowledge/session"
+    ADMIN_SESSION_RESPONSE = "internal/admin/response/session"
+    ADMIN_SCHEDULE_RESPONSE = "internal/admin/response/schedule"
 
-# === External Topics ===
+    TEST_SESSION_ACK = "internal/test/acknowledge/session"
+    TEST_SESSION_RESPONSE = "internal/test/response/session"
+    TEST_SCHEDULE_RESPONSE = "internal/test/response/schedule"
 
-# Communication to physical machines (ESP32s) sending machine updates and requests for info through this topic
-MACHINE_TOPIC_BASE = "external/machine/{id}"
+    # === External Topics ===
 
-# Machine handler receives confirmations of machine updates and requested machine info through this topic
-HANDLER_TOPIC_EXTERNAL = "external/handler"
+    MACHINE_UPDATE_BASE = "external/machine/{id}/update"
+    MACHINE_ACK_BASE = "external/machine/{id}/acknowledge"
+    MACHINE_ALERT_BASE = "external/machine/{id}/alert"
 
-TOPIC_MAP = {
-    Node.KIOSK: KIOSK_TOPIC,
-    Node.ADMIN: ADMIN_TOPIC,
-    Node.RESERVATION: RESERVATION_TOPIC,
-    Node.HANDLER: HANDLER_TOPIC_INTERNAL,
-    Node.MANAGER: MANAGER_TOPIC
-}
+    HANDLER_TOPIC_EXTERNAL = "external/handler"
 
-# === External Topic Helpers ===
+    # === External Topic Helpers ===
 
-def machine_topic(machine_id: int) -> str:
-    """
-    Returns the MQTT topic for communicating with a specific machine.
-    
-    Args:
-        machine_id (str): The unique ID of the machine.
-    
-    Returns:
-        str: Formatted MQTT topic string.
-    """
-    return MACHINE_TOPIC_BASE.format(id=str(machine_id))
+    @staticmethod
+    def MACHINE_UPDATE_EXTERNAL(machine_id: int) -> str:
+        return MACHINE_UPDATE_BASE.format(id=str(machine_id))
+
+    @staticmethod
+    def MACHINE_ACK_EXTERNAL(machine_id: int) -> str:
+        return MACHINE_ACK_BASE.format(id=str(machine_id))
+
+    @staticmethod
+    def MACHINE_ALERT_EXTERNAL(machine_id: int) -> str:
+        return MACHINE_ALERT_BASE.format(id=str(machine_id))
+
+    '''
+    TOPIC_MAP = {
+        Node.KIOSK: KIOSK_TOPIC,
+        Node.ADMIN: ADMIN_TOPIC,
+        Node.RESERVATION: RESERVATION_TOPIC,
+        Node.HANDLER: HANDLER_TOPIC_INTERNAL,
+        Node.MANAGER: MANAGER_TOPIC
+    }
+    '''

@@ -11,7 +11,7 @@ from multiprocessing import Manager, Event
 from mqtt import MQTTClient
 from config import MQTTConfig
 from config import MANAGER_TOPIC, KIOSK_TOPIC, ADMIN_TOPIC, RESERVATION_TOPIC, TOPIC_MAP
-from config import machine_id_list
+from config import MACHINE_ID_LIST
 from utils import SESSION, SCHEDULE, CONFIRMATION, REQUEST, MACHINE
 from utils import get_logger
 from utils import Status, Node, Request
@@ -209,7 +209,7 @@ def generate_blank_schedule(date: str) -> list:
         time_bucket = [int((start_of_day + timedelta(seconds=TIME_BUCKET_SIZE * i)).timestamp())]
 
         # Add a MACHINE object for each machine ID
-        for machine_id in machine_id_list:
+        for machine_id in MACHINE_ID_LIST:
             machine = MACHINE(
                 machine_id=machine_id,
                 status=Status.AVAILABLE,
